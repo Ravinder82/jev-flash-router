@@ -231,24 +231,6 @@ Evaluates context and returns calibrated probabilities.
 
 ---
 
-## 🚀 Publish Your Own Copy
-
-### Login to npm
-
-```bash
-npm login
-```
-
-### Publish
-
-```bash
-npm publish --access public
-```
-
-Then anyone can run `npx -y jev-flash-router` worldwide.
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
