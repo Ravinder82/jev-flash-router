@@ -105,6 +105,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       },
     };
 
+    // Strip reasoning flags that ZCode IDE may inject — these cause HTTP 400
+    // on providers (NVIDIA NIM, non-reasoning OpenRouter endpoints) that
+    // enforce strict parameter validation.
+    // @ts-expect-error — these properties are injected by the client and not part of our schema
+    delete payload.enable_thinking;
+    // @ts-expect-error
+    delete payload.reasoning;
+    // @ts-expect-error
+    delete payload.thinking;
+
     const response = await fetch("https://openrouter.ai/api/alpha/decisions", {
       method: "POST",
       headers: {
