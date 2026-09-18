@@ -1,0 +1,71 @@
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# Env files
+.env
+.env.local
+.env.production
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Packages
+package-lock.json
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Output directories
+.out/
+build/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.code-workspace
+*.sln
+*.suo
+*.user
+
+# Distribution / packaging
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# Other
+*.db
+*.sqlite
+*.sqlite3
+
+# Local config
+*.local
+*.dev
+
+# Coverage directories
+coverage/
+.nyc_output/
+
+# Dependencies (already excluded via npm)
