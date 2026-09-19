@@ -43,3 +43,38 @@ Obtain an API key from [OpenRouter](https://openrouter.ai/) with access to the J
     }
   }
 }
+
+
+Option B: Run from Local Source (Cloned Repository)
+{
+  "mcpServers": {
+    "jev": {
+      "command": "node",
+      "args": ["/path/to/jev-flash-router/dist/index.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "sk-or-v1-YOUR-ACTUAL-API-KEY"
+      }
+    }
+  }
+}
+
+Installation for DevelopersClone and Run LocallyBash
+
+git clone [https://github.com/Ravinder82/jev-flash-router.git](https://github.com/Ravinder82/jev-flash-router.git)
+
+cd jev-flash-router
+
+npm install
+
+npx tsc --types node && chmod +x dist/index.js
+
+API ReferenceTool: evaluate_decisionEvaluates context and returns calibrated probabilities.
+
+ParameterTypeRequiredDescriptionstatestringYesContext, code diff, error log, or task descriptionquestionstringYesTargeted question (e.g., "Will this change cause a breaking API error?")typestringYesDecision format: "noul", "choice", or "score"criteriaobjectYesCriteria map matching the chosen typeCriteria Examplesnoul (binary yes/no):JSON{ "true": "breaks existing callers", "false": "backward compatible" }
+
+choice (categorical):JSON{ "option1": "use caching", "option2": "recompute", "option3": "defer" }
+
+score (ordered rubric):JSON["critical", "warning", "info"]
+
+Cost and PerformanceMetricValueLatency
+~150msOutput tokens0Output cost$0.00Input cost~$0.042 / 1M tokensModeltypesafe/jev-latestLicenseMIT
