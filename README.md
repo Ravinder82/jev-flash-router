@@ -45,7 +45,8 @@ Obtain an API key from [OpenRouter](https://openrouter.ai/) with access to the J
 }
 
 
-Option B: Run from Local Source (Cloned Repository)
+### Option B: Run from Local Source (Cloned Repository)
+```json
 {
   "mcpServers": {
     "jev": {
@@ -58,7 +59,7 @@ Option B: Run from Local Source (Cloned Repository)
   }
 }
 
-Installation for DevelopersClone and Run LocallyBash
+### Installation for DevelopersClone and Run LocallyBash
 
 git clone [https://github.com/Ravinder82/jev-flash-router.git](https://github.com/Ravinder82/jev-flash-router.git)
 
