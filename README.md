@@ -1,12 +1,13 @@
+```markdown
 # jev-flash-router
 
-[![npm version](https://img.shields.io/npm/v/jev-flash-router.svg)](https://www.npmjs.com/package/jev-flash-router)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![MCP](https://img.shields.io/badge/MCP-Compatible-blue.svg)](https://modelcontextprotocol.io/)
-[![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple.svg)](https://openrouter.ai/)
+[![npm version](https://www.npmjs.com/package/jev-flash-router)](https://www.npmjs.com/package/jev-flash-router)
+[![License: MIT](https://opensource.org/licenses/MIT)](https://github.com/Ravinder82/jev-flash-router/blob/main/LICENSE)
+[![Node.js](https://nodejs.org/)](https://nodejs.org/)
+[![MCP](https://modelcontextprotocol.io/)](https://modelcontextprotocol.io/)
+[![OpenRouter](https://openrouter.ai/)](https://openrouter.ai/)
 
-*Zero-token-output decision router MCP server powered by TypeSafe Jev.*
+Zero-token-output decision router MCP server powered by TypeSafe Jev.
 
 AI coding agents waste hundreds of reasoning tokens just deciding which file to edit, which route to pick, or whether a diff breaks tests. **jev-flash-router** evaluates context, code diffs, logs, or planning options and returns calibrated probabilities in ~150ms — with **$0.00 output token cost**.
 
@@ -44,8 +45,10 @@ Obtain an API key from [OpenRouter](https://openrouter.ai/) with access to the J
   }
 }
 
+```
 
-### Option B: Run from Local Source (Cloned Repository)
+#### Option B: Run from Local Source (Cloned Repository)
+
 ```json
 {
   "mcpServers": {
@@ -59,23 +62,157 @@ Obtain an API key from [OpenRouter](https://openrouter.ai/) with access to the J
   }
 }
 
-### Installation for DevelopersClone and Run LocallyBash
+```
 
+#### Option C: GUI Client Setup (Manual Field Entry)
+
+* **Server name:** `jev`
+* **Executable command:** `node` (or `npx`)
+* **Arguments:** `/path/to/jev-flash-router/dist/index.js` (or `-y\njev-flash-router`)
+* **Environment:** `OPENROUTER_API_KEY=sk-or-v1-YOUR-ACTUAL-API-KEY`
+
+---
+
+## MCP Client Configuration
+
+### Cursor
+
+Go to **Settings** → **Features** → **MCP Servers** → **Add New MCP Server**:
+
+```json
+{
+  "mcpServers": {
+    "jev": {
+      "command": "node",
+      "args": ["/path/to/jev-flash-router/dist/index.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "sk-or-v1-YOUR-ACTUAL-API-KEY"
+      }
+    }
+  }
+}
+
+```
+
+### Claude Desktop
+
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "jev": {
+      "command": "node",
+      "args": ["/path/to/jev-flash-router/dist/index.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "sk-or-v1-YOUR-ACTUAL-API-KEY"
+      }
+    }
+  }
+}
+
+```
+
+### Windsurf
+
+Add to your Windsurf MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "jev": {
+      "command": "node",
+      "args": ["/path/to/jev-flash-router/dist/index.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "sk-or-v1-YOUR-ACTUAL-API-KEY"
+      }
+    }
+  }
+}
+
+```
+
+---
+
+## Installation for Developers
+
+### Clone and Run Locally
+
+```bash
 git clone [https://github.com/Ravinder82/jev-flash-router.git](https://github.com/Ravinder82/jev-flash-router.git)
-
 cd jev-flash-router
-
 npm install
-
 npx tsc --types node && chmod +x dist/index.js
 
-API ReferenceTool: evaluate_decisionEvaluates context and returns calibrated probabilities.
+```
 
-ParameterTypeRequiredDescriptionstatestringYesContext, code diff, error log, or task descriptionquestionstringYesTargeted question (e.g., "Will this change cause a breaking API error?")typestringYesDecision format: "noul", "choice", or "score"criteriaobjectYesCriteria map matching the chosen typeCriteria Examplesnoul (binary yes/no):JSON{ "true": "breaks existing callers", "false": "backward compatible" }
+---
 
-choice (categorical):JSON{ "option1": "use caching", "option2": "recompute", "option3": "defer" }
+## API Reference
 
-score (ordered rubric):JSON["critical", "warning", "info"]
+### Tool: `evaluate_decision`
 
-Cost and PerformanceMetricValueLatency
-~150msOutput tokens0Output cost$0.00Input cost~$0.042 / 1M tokensModeltypesafe/jev-latestLicenseMIT
+Evaluates context and returns calibrated probabilities.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `state` | string | Yes | Context, code diff, error log, or task description |
+| `question` | string | Yes | Targeted question (e.g., "Will this change cause a breaking API error?") |
+| `type` | string | Yes | Decision format: `"noul"`, `"choice"`, or `"score"` |
+| `criteria` | object | Yes | Criteria map matching the chosen type |
+
+### Criteria Examples
+
+**noul (binary yes/no):**
+
+```json
+{
+  "true": "breaks existing callers",
+  "false": "backward compatible"
+}
+
+```
+
+**choice (categorical):**
+
+```json
+{
+  "option1": "use caching",
+  "option2": "recompute",
+  "option3": "defer"
+}
+
+```
+
+**score (ordered rubric):**
+
+```json
+[
+  "critical",
+  "warning",
+  "info"
+]
+
+```
+
+---
+
+## Cost and Performance
+
+| Metric | Value |
+| --- | --- |
+| **Latency** | ~150ms |
+| **Output tokens** | 0 |
+| **Output cost** | $0.00 |
+| **Input cost** | ~$0.042 / 1M tokens |
+| **Model** | `typesafe/jev-latest` |
+
+---
+
+## License
+
+MIT
+
+```
+
+```
