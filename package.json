@@ -1,17 +1,25 @@
 {
   "name": "jev-flash-router",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Zero-token-output decision router MCP server powered by TypeSafe Jev",
   "type": "module",
+  "main": "./dist/index.js",
   "bin": {
     "jev-flash-router": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc && chmod +x dist/index.js",
+    "prepublishOnly": "npm run build",
     "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ravinder82/jev-flash-router.git"
   },
   "keywords": [
     "mcp",
@@ -21,11 +29,11 @@
     "openrouter",
     "routing"
   ],
-  "author": "",
+  "author": "Ravinder82",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.0",
-    "dotenv": "^18.0.1"
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "dotenv": "^16.4.7"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
@@ -33,3 +41,4 @@
     "typescript": "^7.0.2"
   }
 }
+

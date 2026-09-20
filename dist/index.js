@@ -1,14 +1,31 @@
 #!/usr/bin/env node
 // Redirect all stdout logs to stderr so MCP handshake doesn't break
 console.log = (...args) => process.stderr.write(args.join(" ") + "\n");
+console.info = (...args) => process.stderr.write(args.join(" ") + "\n");
+console.debug = (...args) => process.stderr.write(args.join(" ") + "\n");
+import fs from "fs";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
 import dotenv from "dotenv";
 dotenv.config({ quiet: true });
+// Read server version dynamically from package.json
+let serverVersion = "1.0.2";
+try {
+    const pkgUrl = new URL("../package.json", import.meta.url);
+    if (fs.existsSync(pkgUrl)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgUrl, "utf-8"));
+        if (pkg.version) {
+            serverVersion = pkg.version;
+        }
+    }
+}
+catch {
+    // Fallback to default version if package.json read fails
+}
 const server = new Server({
     name: "jev-flash-router",
-    version: "1.0.0",
+    version: serverVersion,
 }, {
     capabilities: {
         tools: {},
@@ -38,8 +55,22 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                             description: "Decision format: 'noul' (binary yes/no probability), 'choice' (categorical distribution), or 'score' (ordered rubric).",
                         },
                         criteria: {
-                            type: "object",
                             description: "Criteria map: for 'noul' provide { true: '...', false: '...' }, for 'choice' provide { option1: '...', option2: '...' }, for 'score' provide an array of strings in order.",
+                            oneOf: [
+                                {
+                                    type: "object",
+                                },
+                                {
+                                    type: "array",
+                                    items: {
+                                        type: "string",
+                                    },
+                                },
+                            ],
+                        },
+                        apiKey: {
+                            type: "string",
+                            description: "Optional OpenRouter API key. If omitted, the OPENROUTER_API_KEY environment variable will be used.",
                         },
                     },
                     required: ["state", "question", "type", "criteria"],
@@ -56,19 +87,45 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             isError: true,
         };
     }
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
+    const args = (request.params.arguments || {});
+    const apiKey = args.apiKey ||
+        args.api_key ||
+        process.env.OPENROUTER_API_KEY;
+    if (!apiKey ||
+        typeof apiKey !== "string" ||
+        apiKey.trim() === "" ||
+        apiKey === "your_openrouter_api_key_here") {
         return {
             content: [
                 {
                     type: "text",
-                    text: "Missing OPENROUTER_API_KEY. Please provide OPENROUTER_API_KEY in your MCP client environment configuration.",
+                    text: "Missing or invalid OPENROUTER_API_KEY. Please provide a valid OPENROUTER_API_KEY in your MCP client environment configuration or as an apiKey tool argument.",
                 },
             ],
             isError: true,
         };
     }
-    const { state, question, type, criteria } = request.params.arguments;
+    const { state, question, type, criteria } = args;
+    const missingFields = [];
+    if (!state)
+        missingFields.push("state");
+    if (!question)
+        missingFields.push("question");
+    if (!type)
+        missingFields.push("type");
+    if (criteria === undefined || criteria === null)
+        missingFields.push("criteria");
+    if (missingFields.length > 0) {
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: `Missing required argument(s): ${missingFields.join(", ")}.`,
+                },
+            ],
+            isError: true,
+        };
+    }
     const startTime = Date.now();
     try {
         const payload = {
@@ -82,10 +139,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 },
             },
         };
-        // Strip reasoning flags that ZCode IDE may inject — these cause HTTP 400
-        // on providers (NVIDIA NIM, non-reasoning OpenRouter endpoints) that
-        // enforce strict parameter validation.
-        // @ts-expect-error — these properties are injected by the client and not part of our schema
+        // Strip reasoning flags that certain IDE clients may inject
+        // @ts-expect-error — these properties might be injected by clients
         delete payload.enable_thinking;
         // @ts-expect-error
         delete payload.reasoning;
@@ -94,7 +149,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const response = await fetch("https://openrouter.ai/api/alpha/decisions", {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${apiKey}`,
+                Authorization: `Bearer ${apiKey.trim()}`,
                 "Content-Type": "application/json",
                 "HTTP-Referer": "https://github.com/Ravinder82/jev-flash-router",
                 "X-OpenRouter-Title": "jev-flash-router",
@@ -145,12 +200,25 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
     }
 });
+// Process signal & error handlers
+process.on("uncaughtException", (error) => {
+    process.stderr.write(`[jev-flash-router] Uncaught exception: ${error?.stack || error}\n`);
+});
+process.on("unhandledRejection", (reason) => {
+    process.stderr.write(`[jev-flash-router] Unhandled rejection: ${reason}\n`);
+});
+process.on("SIGINT", () => {
+    process.exit(0);
+});
+process.on("SIGTERM", () => {
+    process.exit(0);
+});
 // Start the stdio transport
 async function main() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
 }
 main().catch((err) => {
-    console.error("Fatal error starting jev-mcp:", err);
+    console.error("Fatal error starting jev-flash-router:", err);
     process.exit(1);
 });
