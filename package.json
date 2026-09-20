@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
-    "jev-flash-router": "./dist/index.js"
+    "jev-flash-router": "dist/index.js"
   },
   "files": [
     "dist",
@@ -41,4 +41,3 @@
     "typescript": "^7.0.2"
   }
 }
-
