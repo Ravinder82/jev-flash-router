@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Redirect all stdout logs to stderr so MCP handshake doesn't break
+console.log = (...args: any[]) => process.stderr.write(args.join(" ") + "\n");
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -7,7 +9,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const server = new Server(
   {
