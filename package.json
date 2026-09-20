@@ -1,6 +1,6 @@
 {
   "name": "jev-flash-router",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Zero-token-output decision router MCP server powered by TypeSafe Jev",
   "type": "module",
   "bin": {
