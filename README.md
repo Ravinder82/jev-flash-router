@@ -64,6 +64,13 @@ Obtain an API key from [OpenRouter](https://openrouter.ai/) with access to the J
 
 ```
 
+### 3. Install AI Agent Skill (Recommended)
+To automatically configure your AI agent (Antigravity IDE, Cursor, Claude Code) with the Master Jev Skill so it proactively uses zero-token decisions:
+
+```bash
+npx -y jev-flash-router install-skill
+```
+
 #### Option C: GUI Client Setup (Manual Field Entry)
 
 * **Server name:** `jev`

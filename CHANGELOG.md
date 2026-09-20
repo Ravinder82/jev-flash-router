@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-09-20
+
+### Added
+- Embedded `SKILL.md` directly into the npm package.
+- Added automated CLI skill installer: `npx jev-flash-router install-skill` to automatically deploy master skill rules into Antigravity IDE and global AI agent skill folders.
+
 ## [1.0.2] - 2026-09-20
+
 
 ### Fixed
 - Fixed binary path declaration in `package.json` and lockfile (`./dist/index.js`) to prevent npm from stripping the executable during publish.

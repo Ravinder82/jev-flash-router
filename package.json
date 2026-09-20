@@ -1,6 +1,6 @@
 {
   "name": "jev-flash-router",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Zero-token-output decision router MCP server powered by TypeSafe Jev",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,9 +9,11 @@
   },
   "files": [
     "dist",
+    "SKILL.md",
     "README.md",
     "LICENSE"
   ],
+
   "scripts": {
     "build": "tsc && chmod +x dist/index.js",
     "prepublishOnly": "npm run build",

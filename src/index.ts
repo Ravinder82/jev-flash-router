@@ -5,6 +5,8 @@ console.info = (...args: any[]) => process.stderr.write(args.join(" ") + "\n");
 console.debug = (...args: any[]) => process.stderr.write(args.join(" ") + "\n");
 
 import fs from "fs";
+import path from "path";
+import os from "os";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -15,8 +17,59 @@ import dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
 
+// Check for install-skill CLI command
+if (
+  process.argv.includes("install-skill") ||
+  process.argv.includes("install-skills") ||
+  process.argv.includes("--install-skill")
+) {
+  handleInstallSkill();
+}
+
+function handleInstallSkill() {
+  const homeDir = os.homedir();
+  const sourceSkillPath = new URL("../SKILL.md", import.meta.url);
+
+  if (!fs.existsSync(sourceSkillPath)) {
+    process.stderr.write("Error: SKILL.md not found in package.\n");
+    process.exit(1);
+  }
+
+  const skillContent = fs.readFileSync(sourceSkillPath, "utf-8");
+
+  const targetDirs = [
+    path.join(homeDir, ".gemini", "config", "skills", "jev-flash-router"),
+    path.join(homeDir, ".agents", "skills", "jev-flash-router"),
+  ];
+
+  if (process.argv.includes("--local") || process.argv.includes("-l")) {
+    targetDirs.push(path.join(process.cwd(), ".agents", "skills", "jev-flash-router"));
+  }
+
+  let installedCount = 0;
+  for (const dir of targetDirs) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+      const targetFile = path.join(dir, "SKILL.md");
+      fs.writeFileSync(targetFile, skillContent, "utf-8");
+      process.stderr.write(`✓ Installed skill to: ${targetFile}\n`);
+      installedCount++;
+    } catch (err: any) {
+      process.stderr.write(`Warning: Failed to write to ${dir}: ${err?.message || err}\n`);
+    }
+  }
+
+  if (installedCount > 0) {
+    process.stderr.write("\n✓ Skill installation complete! Antigravity IDE and AI agents will now automatically use jev-flash-router.\n");
+  } else {
+    process.stderr.write("\n✖ Failed to install skill.\n");
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
 // Read server version dynamically from package.json
-let serverVersion = "1.0.2";
+let serverVersion = "1.0.3";
 try {
   const pkgUrl = new URL("../package.json", import.meta.url);
   if (fs.existsSync(pkgUrl)) {
